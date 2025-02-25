@@ -1,2 +1,37 @@
-version: "3"
+# Versi Docker Compose yang digunakan
+version: '3'
+
 services:
+  # Konfigurasi untuk service API
+  api:
+    # Build image dari Dockerfile di direktori ./api
+    build:
+      context: ./api
+    # Pemetaan port container:host (6000 di container ke 6000 di host)
+    ports:
+      - "6000:6000"
+    # Nama container untuk service API
+    container_name: api
+    # Daftarkan service ke network app-network
+    networks:
+      - app-network
+
+  # Konfigurasi untuk service ETL
+  etl:
+    # Build image dari Dockerfile di direktori ./etl
+    build:
+      context: ./etl
+    # Nama container untuk service ETL
+    container_name: etl
+    # Service ETL bergantung pada service API (API harus berjalan lebih dulu)
+    depends_on:
+      - api
+    # Daftarkan service ke network app-network
+    networks:
+      - app-network
+
+# Definisi network untuk komunikasi antar service
+networks:
+  app-network:
+    # Gunakan bridge network driver (default)
+    driver: bridge
